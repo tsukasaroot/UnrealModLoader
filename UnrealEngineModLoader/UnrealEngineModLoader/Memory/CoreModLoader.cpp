@@ -38,6 +38,7 @@ namespace CoreModLoader
 		{
 			std::filesystem::create_directory(path);
 		}
+		
 		for (const auto& entry : fs::directory_iterator(path))
 		{
 			if (entry.path().extension().string() == ".dll")
@@ -45,6 +46,19 @@ namespace CoreModLoader
 				std::wstring path = entry.path();
 				std::string str(path.begin(), path.end());
 				InjectDLL(str);
+			}
+			else if (std::filesystem::is_directory(entry.path()))
+			{
+				for (const auto& subfolder_entry : fs::directory_iterator(entry.path()))
+				{
+					if (subfolder_entry.path().extension().string() == ".dll")
+					{
+						std::wstring path = subfolder_entry.path();
+						std::string str(path.begin(), path.end());
+						printf("%s\n", str.c_str());
+						InjectDLL(str);
+					}
+				}
 			}
 		}
 	}
